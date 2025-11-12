@@ -2,13 +2,22 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
-import { useTheme } from "../contexts/ThemeContext"; // ✅ Theme hook
+import { useTheme } from "../contexts/ThemeContext";
 
 function Navbar() {
   const { cartItems } = useCart();
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme(); // ✅ Theme variables
+  const { theme, toggleTheme } = useTheme();
   const itemCount = cartItems.reduce((sum, item) => sum + item.qty, 0);
+
+  // ✅ Function to close the offcanvas menu manually when clicking a link
+  const closeOffcanvas = () => {
+    const offcanvasElement = document.getElementById("mobileMenu");
+    if (offcanvasElement) {
+      const bsOffcanvas = window.bootstrap.Offcanvas.getInstance(offcanvasElement);
+      if (bsOffcanvas) bsOffcanvas.hide();
+    }
+  };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm fixed-top">
@@ -102,12 +111,12 @@ function Navbar() {
           </ul>
         </div>
 
-        {/* Mobile Offcanvas */}
+        {/* Mobile Offcanvas Menu */}
         <div
           className="offcanvas offcanvas-start bg-dark text-light d-lg-none"
           tabIndex="-1"
           id="mobileMenu"
-          style={{ width: "150px" }}
+          style={{ width: "180px" }}
         >
           <div className="offcanvas-header">
             <h5 className="offcanvas-title">Menu</h5>
@@ -125,7 +134,7 @@ function Navbar() {
                 <Link
                   className="nav-link text-light"
                   to="/"
-                  data-bs-dismiss="offcanvas"
+                  onClick={closeOffcanvas}
                 >
                   Home
                 </Link>
@@ -134,7 +143,7 @@ function Navbar() {
                 <Link
                   className="nav-link text-light"
                   to="/products"
-                  data-bs-dismiss="offcanvas"
+                  onClick={closeOffcanvas}
                 >
                   Products
                 </Link>
@@ -143,7 +152,7 @@ function Navbar() {
                 <Link
                   className="nav-link text-light position-relative"
                   to="/cart"
-                  data-bs-dismiss="offcanvas"
+                  onClick={closeOffcanvas}
                 >
                   Cart
                   {itemCount > 0 && (
@@ -167,8 +176,10 @@ function Navbar() {
                   <li className="nav-item">
                     <button
                       className="btn btn-outline-light btn-sm mt-2 w-100"
-                      data-bs-dismiss="offcanvas"
-                      onClick={logout}
+                      onClick={() => {
+                        logout();
+                        closeOffcanvas();
+                      }}
                     >
                       Logout
                     </button>
@@ -180,7 +191,7 @@ function Navbar() {
                     <Link
                       className="nav-link text-light"
                       to="/login"
-                      data-bs-dismiss="offcanvas"
+                      onClick={closeOffcanvas}
                     >
                       Login
                     </Link>
@@ -189,7 +200,7 @@ function Navbar() {
                     <Link
                       className="nav-link text-light"
                       to="/signup"
-                      data-bs-dismiss="offcanvas"
+                      onClick={closeOffcanvas}
                     >
                       Signup
                     </Link>
@@ -202,7 +213,7 @@ function Navbar() {
                 <button
                   onClick={() => {
                     toggleTheme();
-                    document.querySelector('[data-bs-dismiss="offcanvas"]')?.click();
+                    closeOffcanvas();
                   }}
                   className="btn btn-outline-light btn-sm w-100"
                   style={{ borderRadius: "20px" }}
