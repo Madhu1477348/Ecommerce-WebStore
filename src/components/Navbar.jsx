@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
@@ -8,24 +8,39 @@ function Navbar() {
   const { cartItems } = useCart();
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+
   const itemCount = cartItems.reduce((sum, item) => sum + item.qty, 0);
 
-  // ✅ Function to close the offcanvas menu manually when clicking a link
+  // ✅ Close Offcanvas safely after short delay (mobile fix)
   const closeOffcanvas = () => {
     const offcanvasElement = document.getElementById("mobileMenu");
     if (offcanvasElement) {
       const bsOffcanvas = window.bootstrap.Offcanvas.getInstance(offcanvasElement);
-      if (bsOffcanvas) bsOffcanvas.hide();
+      if (bsOffcanvas) {
+        setTimeout(() => {
+          bsOffcanvas.hide();
+        }, 150);
+      }
     }
+  };
+
+  // ✅ Helper for navigating + closing offcanvas
+  const goTo = (path) => {
+    navigate(path);
+    closeOffcanvas();
   };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm fixed-top">
       <div className="container">
         {/* Logo */}
-        <Link className="navbar-brand fw-bold" to="/">
+        <button
+          className="navbar-brand fw-bold bg-transparent border-0 text-light fs-5"
+          onClick={() => goTo("/")}
+        >
           🛍️ MadhuWebStore
-        </Link>
+        </button>
 
         {/* Mobile Toggler */}
         <button
@@ -42,19 +57,28 @@ function Navbar() {
         <div className="d-none d-lg-flex ms-auto align-items-center">
           <ul className="navbar-nav align-items-center">
             <li className="nav-item">
-              <Link className="nav-link" to="/">
+              <button
+                className="nav-link bg-transparent border-0 text-light"
+                onClick={() => goTo("/")}
+              >
                 Home
-              </Link>
+              </button>
             </li>
 
             <li className="nav-item">
-              <Link className="nav-link" to="/products">
+              <button
+                className="nav-link bg-transparent border-0 text-light"
+                onClick={() => goTo("/products")}
+              >
                 Products
-              </Link>
+              </button>
             </li>
 
             <li className="nav-item position-relative">
-              <Link className="nav-link position-relative" to="/cart">
+              <button
+                className="nav-link bg-transparent border-0 text-light position-relative"
+                onClick={() => goTo("/cart")}
+              >
                 Cart
                 {itemCount > 0 && (
                   <span
@@ -64,7 +88,7 @@ function Navbar() {
                     {itemCount}
                   </span>
                 )}
-              </Link>
+              </button>
             </li>
 
             {user ? (
@@ -86,14 +110,20 @@ function Navbar() {
             ) : (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/login">
+                  <button
+                    className="nav-link bg-transparent border-0 text-light"
+                    onClick={() => goTo("/login")}
+                  >
                     Login
-                  </Link>
+                  </button>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/signup">
+                  <button
+                    className="nav-link bg-transparent border-0 text-light"
+                    onClick={() => goTo("/signup")}
+                  >
                     Signup
-                  </Link>
+                  </button>
                 </li>
               </>
             )}
@@ -111,7 +141,7 @@ function Navbar() {
           </ul>
         </div>
 
-        {/* Mobile Offcanvas Menu */}
+        {/* Mobile Offcanvas */}
         <div
           className="offcanvas offcanvas-start bg-dark text-light d-lg-none"
           tabIndex="-1"
@@ -131,28 +161,25 @@ function Navbar() {
           <div className="offcanvas-body">
             <ul className="navbar-nav flex-column text-start">
               <li className="nav-item">
-                <Link
-                  className="nav-link text-light"
-                  to="/"
-                  onClick={closeOffcanvas}
+                <button
+                  className="nav-link text-light bg-transparent border-0 text-start"
+                  onClick={() => goTo("/")}
                 >
                   Home
-                </Link>
+                </button>
               </li>
               <li className="nav-item">
-                <Link
-                  className="nav-link text-light"
-                  to="/products"
-                  onClick={closeOffcanvas}
+                <button
+                  className="nav-link text-light bg-transparent border-0 text-start"
+                  onClick={() => goTo("/products")}
                 >
                   Products
-                </Link>
+                </button>
               </li>
               <li className="nav-item">
-                <Link
-                  className="nav-link text-light position-relative"
-                  to="/cart"
-                  onClick={closeOffcanvas}
+                <button
+                  className="nav-link text-light bg-transparent border-0 text-start position-relative"
+                  onClick={() => goTo("/cart")}
                 >
                   Cart
                   {itemCount > 0 && (
@@ -163,7 +190,7 @@ function Navbar() {
                       {itemCount}
                     </span>
                   )}
-                </Link>
+                </button>
               </li>
 
               {user ? (
@@ -188,22 +215,20 @@ function Navbar() {
               ) : (
                 <>
                   <li className="nav-item">
-                    <Link
-                      className="nav-link text-light"
-                      to="/login"
-                      onClick={closeOffcanvas}
+                    <button
+                      className="nav-link text-light bg-transparent border-0 text-start"
+                      onClick={() => goTo("/login")}
                     >
                       Login
-                    </Link>
+                    </button>
                   </li>
                   <li className="nav-item">
-                    <Link
-                      className="nav-link text-light"
-                      to="/signup"
-                      onClick={closeOffcanvas}
+                    <button
+                      className="nav-link text-light bg-transparent border-0 text-start"
+                      onClick={() => goTo("/signup")}
                     >
                       Signup
-                    </Link>
+                    </button>
                   </li>
                 </>
               )}
